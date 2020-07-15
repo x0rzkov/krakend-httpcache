@@ -4,6 +4,8 @@ package httpcache
 import (
 	"context"
 	"net/http"
+	"log"
+	"os"
 
 	"github.com/devopsfaith/krakend/config"
 	"github.com/devopsfaith/krakend/proxy"
@@ -16,7 +18,8 @@ import (
 const Namespace = "github.com/x0rzkov/krakend-httpcache"
 
 var (
-	cacheTransport httpcache.Cache
+	httpCache      httpcache.Cache
+	cacheTransport *httpcache.Transport
 	cacheClient    = http.Client{}
 )
 
@@ -30,7 +33,7 @@ func NewHTTPClient(cfg *config.Backend, store string) client.HTTPClientFactory {
 	switch store {
 	case "disk":
 		diskCachePath := "./shared/data/cache/krakend/httpcache"
-		err = os.MkdirAll(diskCachePath, os.ModePerm)
+		err := os.MkdirAll(diskCachePath, os.ModePerm)
 		if err != nil {
 			log.Fatal("ERROR:", err.Error())
 		}
@@ -50,6 +53,6 @@ func NewHTTPClient(cfg *config.Backend, store string) client.HTTPClientFactory {
 
 // BackendFactory returns a proxy.BackendFactory that creates backend proxies using
 // an in-memory-cached http client
-func BackendFactory(cfg *config.Backend) proxy.BackendFactory {
-	return proxy.CustomHTTPProxyFactory(NewHTTPClient(cfg))
+func BackendFactory(cfg *config.Backend, store string) proxy.BackendFactory {
+	return proxy.CustomHTTPProxyFactory(NewHTTPClient(cfg, store))
 }

@@ -34,7 +34,7 @@ func TestClient_ko(t *testing.T) {
 }
 
 func testClient(t *testing.T, cfg *config.Backend, URL string) {
-	clientFactory := NewHTTPClient(cfg)
+	clientFactory := NewHTTPClient(cfg, "disk")
 	client := clientFactory(context.Background())
 
 	for i := 0; i < 100; i++ {
@@ -58,7 +58,7 @@ func testClient(t *testing.T, cfg *config.Backend, URL string) {
 
 func TestBackendFactory(t *testing.T) {
 	testCacheSystem(t, func(t *testing.T, testURL string) {
-		backendFactory := BackendFactory(sampleCfg)
+		backendFactory := BackendFactory(sampleCfg, "disk")
 		backendProxy := backendFactory(sampleCfg)
 		ctx := context.Background()
 		URL, _ := url.Parse(testURL)
